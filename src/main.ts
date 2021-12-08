@@ -39,7 +39,8 @@ jbRequest
 
 jbRequest
   .get<IDataType>({
-    url: '/home/multidata'
+    url: '/home/multidata',
+    showLoading: true
   })
   .then((res) => {
     console.log(res.data)

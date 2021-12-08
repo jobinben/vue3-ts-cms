@@ -1,6 +1,8 @@
 // 封装axios
 import axios from 'axios'
+import { ElLoading } from 'element-plus'
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
+import type { ILoadingInstance } from 'element-plus'
 
 interface JBRequestInterceptors<T = AxiosResponse> {
   requestInterceptor?: (config: AxiosRequestConfig) => AxiosRequestConfig
@@ -11,15 +13,23 @@ interface JBRequestInterceptors<T = AxiosResponse> {
 
 interface JBRequestConfig<T = AxiosResponse> extends AxiosRequestConfig {
   interceptors?: JBRequestInterceptors<T>
+  showLoading?: boolean
 }
+
+const DEFAULT_LOADING = true
 
 class JBRequest {
   instance: AxiosInstance
   interceptors?: JBRequestInterceptors
+  showLoading: boolean
+  loading?: ILoadingInstance
 
   constructor(config: JBRequestConfig) {
     // 创建axios实例
     this.instance = axios.create(config)
+
+    // 添加loading
+    this.showLoading = config.showLoading ?? DEFAULT_LOADING
 
     // 封装拦截器
     this.interceptors = config.interceptors
@@ -38,6 +48,13 @@ class JBRequest {
     this.instance.interceptors.request.use(
       (config) => {
         console.log('所有实例都有的拦截器: 请求成功拦截')
+        if (this.showLoading) {
+          this.loading = ElLoading.service({
+            lock: true,
+            text: '正在请求...',
+            background: 'rgba(0, 0, 0, 0.3)'
+          })
+        }
         return config
       },
       (err) => {
@@ -49,10 +66,13 @@ class JBRequest {
     this.instance.interceptors.response.use(
       (res) => {
         console.log('所有实例都有的拦截器: 响应成功拦截')
+        // 响应时 将loading移除
+        this.loading?.close()
         return res.data
       },
       (err) => {
         console.log('所有实例都有的拦截器: 响应失败拦截')
+        this.loading?.close()
         return err
       }
     )
@@ -66,6 +86,11 @@ class JBRequest {
         config = config.interceptors.requestInterceptor(config)
       }
 
+      // 2. 判断是否需要显示loading
+      if (config.showLoading === false) {
+        this.showLoading = config.showLoading
+      }
+
       this.instance
         .request<any, T>(config)
         .then((res) => {
@@ -73,9 +98,12 @@ class JBRequest {
           if (config.interceptors?.responseInterceptor) {
             res = config.interceptors.responseInterceptor(res)
           }
+          // 2. 将showLoading设置为初始值，这样子不会影响下一个请求
+          this.showLoading = DEFAULT_LOADING
           resolve(res)
         })
         .catch((err) => {
+          this.showLoading = DEFAULT_LOADING
           reject(err)
         })
     })
