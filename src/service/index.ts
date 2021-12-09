@@ -1,16 +1,17 @@
 // service 统一出口
 import JBRequest from './request'
 import { BASE_URL, TIME_OUT } from './request/config'
+import LocalCache from '@/utils/cache'
 
 const jbRequest = new JBRequest({
   baseURL: BASE_URL,
   timeout: TIME_OUT,
   interceptors: {
-    requestInterceptor: (config) => {
+    requestInterceptor: (config: any) => {
       // 携带token的拦截
-      const token = ''
+      const token = LocalCache.getCache('token')
       if (token) {
-        // config.headers.Authorization = `Bearer ${token}`
+        config.headers.Authorization = `Bearer ${token}`
       }
       console.log('请求成功的拦截')
       return config

@@ -3,7 +3,7 @@ const TIME_OUT = 10000
 
 // 此次采用了策略模式
 const settings: any = {
-  development: () => (BASE_URL = 'http://123.207.32.32:8000/'),
+  development: () => (BASE_URL = '/api'),
   production: () => (BASE_URL = 'http://jobing.top/pro'),
   test: () => (BASE_URL = 'http://jobing.top/test')
 }
