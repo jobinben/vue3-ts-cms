@@ -7,13 +7,8 @@ import {
 } from '@/service/login/login'
 import type { IAccount } from '@/service/login/type'
 import type { IRootState } from '../type'
+import type { ILoginState } from './types'
 import router from '@/router'
-
-interface ILoginState {
-  token: string
-  userInfo: any
-  userMenus: any
-}
 
 const loginModule: Module<ILoginState, IRootState> = {
   namespaced: true,
