@@ -6,12 +6,19 @@ const routes: Array<RouteRecordRaw> = [
     redirect: '/login'
   },
   {
+    name: 'login',
     path: '/login',
     component: () => import('@/views/login/login.vue')
   },
   {
+    name: 'main',
     path: '/main',
     component: () => import('@/views/main/main.vue')
+  },
+  {
+    name: 'not-found',
+    path: '/:pathMatch(.*)*',
+    component: () => import('@/views/not-found/not-found.vue')
   }
 ]
 

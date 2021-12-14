@@ -9,6 +9,7 @@ import type { IAccount } from '@/service/login/type'
 import type { IRootState } from '../type'
 import type { ILoginState } from './types'
 import router from '@/router'
+import { mapMenusToRoutes } from '@/utils/map-menus'
 
 const loginModule: Module<ILoginState, IRootState> = {
   namespaced: true,
@@ -31,6 +32,13 @@ const loginModule: Module<ILoginState, IRootState> = {
     },
     changeUserMenus(state: ILoginState, userMenus: any) {
       state.userMenus = userMenus
+      // 注册动态路由
+      // userMenus => routes
+      const routes = mapMenusToRoutes(userMenus)
+      // 注册
+      routes.forEach((route) => {
+        router.addRoute('main', route)
+      })
     }
   },
 
